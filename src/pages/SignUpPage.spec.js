@@ -138,12 +138,9 @@ describe('Sign Up Page', () => {
 
       const button = screen.queryByRole('button', { name: 'Sign Up' });
 
-      await userEvent.click(button);
-      
-      server.close();
-      
-      const spinner = screen.queryByRole('status');
-      console.log(spinner)
+      userEvent.click(button).then(() => { server.close() });
+
+      const spinner = await screen.findByRole('status');
       expect(spinner).toBeInTheDocument();
     });
 
