@@ -1,5 +1,5 @@
 import SignUpPage from './SignUpPage.vue';
-import { render, screen } from '@testing-library/vue';
+import { render, screen, waitFor } from '@testing-library/vue';
 import "@testing-library/jest-dom";
 import userEvent from "@testing-library/user-event";
 import { setupServer } from 'msw/node';
@@ -139,8 +139,11 @@ describe('Sign Up Page', () => {
       const button = screen.queryByRole('button', { name: 'Sign Up' });
 
       await userEvent.click(button);
-
+      
+      server.close();
+      
       const spinner = screen.queryByRole('status');
+      console.log(spinner)
       expect(spinner).toBeInTheDocument();
     });
 
@@ -149,6 +152,76 @@ describe('Sign Up Page', () => {
 
       const spinner = screen.queryByRole('status');
       expect(spinner).not.toBeInTheDocument();
+    });
+
+    it('displays account activation information after successful sign up request', async () => {
+      const server = setupServer(
+        rest.post('/api/1.0/users', (req, res, ctx) => {
+          return res(ctx.status(200));
+        }),
+      );
+      server.listen();
+
+      await setup();
+
+      const button = screen.queryByRole('button', { name: 'Sign Up' });
+
+      await userEvent.click(button);
+
+      server.close();
+
+      const text = await screen.findByText('Please check your e-mail to activate your account');
+      expect(text).toBeInTheDocument();
+    });
+
+    it('does not display account activation message before sign up request', async () => {
+      await setup();
+
+      const text = screen.queryByText('Please check your e-mail to activate your account');
+      expect(text).not.toBeInTheDocument();
+    });
+
+    it('does not display account activation information after failing sign up request', async () => {
+      const server = setupServer(
+        rest.post('/api/1.0/users', (req, res, ctx) => {
+          return res(ctx.status(400));
+        }),
+      );
+      server.listen();
+
+      await setup();
+
+      const button = screen.queryByRole('button', { name: 'Sign Up' });
+
+      await userEvent.click(button);
+
+      server.close();
+
+      const text = screen.queryByText('Please check your e-mail to activate your account');
+      expect(text).not.toBeInTheDocument();
+    });
+
+    it('hides sign up form after successful sign up request', async () => {
+      const server = setupServer(
+        rest.post('/api/1.0/users', (req, res, ctx) => {
+          return res(ctx.status(200));
+        }),
+      );
+      server.listen();
+
+      await setup();
+
+      const button = screen.queryByRole('button', { name: 'Sign Up' });
+
+      const form = screen.queryByTestId('form-sign-up');
+
+      await userEvent.click(button);
+
+      server.close();
+
+      await waitFor(() => {
+        expect(form).not.toBeInTheDocument();
+      })
     });
   });
 });

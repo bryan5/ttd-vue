@@ -1,6 +1,6 @@
 <template>
 <div class="col-lg-6 offset-lg-3 col-md-8 offset-md-2">
-  <form class="card mt-5">
+  <form v-if="!signUpSuccess" class="card mt-5" data-testid="form-sign-up">
     <div class="card-header">
       <h1 class="text-center">Sign Up</h1>
     </div>
@@ -34,6 +34,8 @@
       </div>
     </div>
   </form>
+
+  <div v-else class="alert alert-success mt-3">Please check your e-mail to activate your account</div>
 </div>
 </template>
 
@@ -51,6 +53,7 @@ export default {
       password: '',
       passwordRepeat: '',
       apiProgress: false,
+      signUpSuccess: false,
     }
   },
 
@@ -63,7 +66,9 @@ export default {
         username: this.username,
         email: this.email,
         password: this.password,
-      })
+      }).then(() => {
+        this.signUpSuccess = true
+      }).catch(() => {})
     },
   },
 
