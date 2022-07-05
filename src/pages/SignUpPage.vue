@@ -6,11 +6,12 @@
     </div>
 
     <div class="card-body">
-      <div class="mb-3">
+      <GeneralInput id="username" label="Username" :help="errors.username" v-model="username" />
+      <!-- <div class="mb-3">
         <label for="username" class="form-label">Username</label>
         <input id="username" v-model="username" class="form-control" />
         <span v-if="errors.username">{{ errors.username }}</span>
-      </div>
+      </div> -->
 
       <div class="mb-3">
         <label for="e-mail" class="form-label">E-mail</label>
@@ -28,7 +29,7 @@
       </div>
 
       <div class="text-center">
-        <button class="btn btn-primary" :disabled="isDisabled || disabled" @click.prevent="submit">
+        <button class="btn btn-primary" :disabled="isDisabled || apiProgress" @click.prevent="submit">
           <span v-if="apiProgress" class="spinner-border spinner-border-sm" role="status"></span>
           Sign Up
         </button>
@@ -43,12 +44,17 @@
 <script>
 import axios from 'axios'
 
+import GeneralInput from '../components/GeneralInput'
+
 export default {
   name: 'SignUpPage',
 
+  components: {
+    GeneralInput,
+  },
+
   data() {
     return {
-      disabled: false,
       username: '',
       email: '',
       password: '',
@@ -61,7 +67,6 @@ export default {
 
   methods: {
     submit() {
-      this.disabled = true
       this.apiProgress = true
 
       axios.post('/api/1.0/users', {
@@ -74,6 +79,8 @@ export default {
         if (error.response.status === 400) {
           this.errors = error.response.data.validationErrors || {}
         }
+
+        this.apiProgress = false
       })
     },
   },
