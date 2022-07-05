@@ -9,8 +9,9 @@
       <div class="mb-3">
         <label for="username" class="form-label">Username</label>
         <input id="username" v-model="username" class="form-control" />
+        <span v-if="errors.username">{{ errors.username }}</span>
       </div>
-      
+
       <div class="mb-3">
         <label for="e-mail" class="form-label">E-mail</label>
         <input id="e-mail" v-model="email" class="form-control" />
@@ -54,6 +55,7 @@ export default {
       passwordRepeat: '',
       apiProgress: false,
       signUpSuccess: false,
+      errors: {},
     }
   },
 
@@ -68,7 +70,11 @@ export default {
         password: this.password,
       }).then(() => {
         this.signUpSuccess = true
-      }).catch(() => {})
+      }).catch((error) => {
+        if (error.response.status === 400) {
+          this.errors = error.response.data.validationErrors || {}
+        }
+      })
     },
   },
 
