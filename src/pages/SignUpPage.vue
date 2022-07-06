@@ -6,27 +6,35 @@
     </div>
 
     <div class="card-body">
-      <GeneralInput id="username" label="Username" :help="errors.username" v-model="username" />
-      <!-- <div class="mb-3">
-        <label for="username" class="form-label">Username</label>
-        <input id="username" v-model="username" class="form-control" />
-        <span v-if="errors.username">{{ errors.username }}</span>
-      </div> -->
+      <GeneralInput
+        id="username"
+        label="Username"
+        :help="errors.username"
+        v-model="username"
+      />
 
-      <div class="mb-3">
-        <label for="e-mail" class="form-label">E-mail</label>
-        <input id="e-mail" v-model="email" class="form-control" />
-      </div>
+      <GeneralInput
+        id="e-mail"
+        label="E-mail"
+        :help="errors.email"
+        v-model="email"
+      />
 
-      <div class="mb-3">
-        <label for="password" class="form-label">Password</label>
-        <input id="password" type="password" v-model="password" class="form-control" />
-      </div>
+      <GeneralInput
+        id="password"
+        label="Password"
+        :help="errors.password"
+        v-model="password"
+        type="password"
+      />
 
-      <div class="mb-3">
-        <label for="password-repeat" class="form-label">Password Repeat</label>
-        <input id="password-repeat" type="password" v-model="passwordRepeat" class="form-control" />
-      </div>
+      <GeneralInput
+        id="password-repeat"
+        label="Password Repeat"
+        :help="hasPasswordMismatch ? 'Password mismatch' : ''"
+        v-model="passwordRepeat"
+        type="password"
+      />
 
       <div class="text-center">
         <button class="btn btn-primary" :disabled="isDisabled || apiProgress" @click.prevent="submit">
@@ -90,6 +98,10 @@ export default {
       return (this.password && this.passwordRepeat)
         ? this.password !== this.passwordRepeat
         : true
+    },
+
+    hasPasswordMismatch() {
+      return this.password !== this.passwordRepeat
     },
   },
 }

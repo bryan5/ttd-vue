@@ -82,19 +82,29 @@ describe('Sign Up Page', () => {
 
     afterAll(() => server.close());
 
-    let button;
+    let button, passwordInput, passwordRepeatInput;
     const setup = async () => {
       render(SignUpPage);
       const usernameInput = screen.queryByLabelText('Username');
       const emailInput = screen.queryByLabelText('E-mail');
-      const passwordInput = screen.queryByLabelText('Password');
-      const passwordRepeatInput = screen.queryByLabelText('Password Repeat');
+      passwordInput = screen.queryByLabelText('Password');
+      passwordRepeatInput = screen.queryByLabelText('Password Repeat');
       button = screen.queryByRole('button', { name: 'Sign Up' });
       await userEvent.type(usernameInput, 'user1');
       await userEvent.type(emailInput, 'user1@mail.com');
       await userEvent.type(passwordInput, 'P4ssword');
       await userEvent.type(passwordRepeatInput, 'P4ssword');
     };
+
+    const generateValidationError = (field, message) => {
+      return rest.post('/api/1.0/users', (req, res, ctx) => {
+        return res(ctx.status(400), ctx.json({
+          validationErrors: {
+            [field]: message,
+          },
+        }));
+      });
+    }
 
     it('enables the button when the password and password repeat fields have same value', async () => {
       await setup();
@@ -184,35 +194,24 @@ describe('Sign Up Page', () => {
       })
     });
 
-    it('displays validation message for username', async () => {
-      server.use(
-        rest.post('/api/1.0/users', (req, res, ctx) => {
-          return res(ctx.status(400), ctx.json({
-            validationErrors: {
-              username: 'Username cannot be null',
-            },
-          }));
-        })
-      );
+    it.each`
+      field         | message
+      ${'username'} | ${'Username cannot be null'}
+      ${'email'}    | ${'E-mail cannot be null'}
+      ${'password'} | ${'Password cannot be null'}
+    `('displays $message for field $field', async ({ field, message }) => {
+      server.use(generateValidationError(field, message));
 
       await setup();
 
       await userEvent.click(button);
 
-      const text = await screen.findByText('Username cannot be null');
+      const text = await screen.findByText(message);
       expect(text).toBeInTheDocument();
     });
 
     it('hides spinner after error response is received', async () => {
-      server.use(
-        rest.post('/api/1.0/users', (req, res, ctx) => {
-          return res(ctx.status(400), ctx.json({
-            validationErrors: {
-              username: 'Username cannot be null',
-            },
-          }));
-        })
-      );
+      server.use(generateValidationError('username', 'Username cannot be null'));
 
       await setup();
 
@@ -225,15 +224,7 @@ describe('Sign Up Page', () => {
     });
 
     it('enables the button after error response is received', async () => {
-      server.use(
-        rest.post('/api/1.0/users', (req, res, ctx) => {
-          return res(ctx.status(400), ctx.json({
-            validationErrors: {
-              username: 'Username cannot be null',
-            },
-          }));
-        })
-      );
+      server.use(generateValidationError('username', 'Username cannot be null'));
 
       await setup();
 
@@ -242,6 +233,16 @@ describe('Sign Up Page', () => {
       await screen.findByText('Username cannot be null');
 
       expect(button).toBeEnabled();
+    });
+
+    it('displays mismatch password for password repeat input', () => {
+      await setup();
+
+      await userEvent.type(passwordInput, 'P4ss1');
+      await userEvent.type(passwordRepeatInput, 'P4ss2');
+
+      const text = await screen.findByText('Password mismatch');
+      expect(text).toBeInTheDocument();
     });
   });
 });
