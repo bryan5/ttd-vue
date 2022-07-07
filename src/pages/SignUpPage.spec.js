@@ -5,6 +5,9 @@ import userEvent from "@testing-library/user-event";
 import { setupServer } from 'msw/node';
 import { rest } from 'msw';
 import i18n from '../locales/i18n';
+import en from '../locales/en.json';
+import tr from '../locales/tr.json';
+import LanguageSelector from '../components/LanguageSelector.vue';
 
 describe('Sign Up Page', () => {
   describe('Layout', () => {
@@ -274,6 +277,73 @@ describe('Sign Up Page', () => {
       const input = screen.queryByLabelText(label);
       await userEvent.type(input, 'updated');
       expect(text).not.toBeInTheDocument();
+    });
+  });
+
+  describe('Internationalization', () => {
+    let turkishLanguage, englishLanguage;
+    const setup = () => {
+      const app = {
+        components: {
+          SignUpPage,
+          LanguageSelector,
+        },
+        template: `
+        <SignUpPage />
+        <LanguageSelector />
+        `,
+      };
+
+      render(app, {
+        global: {
+          plugins: [i18n],
+        },
+      });
+
+      turkishLanguage = screen.queryByTitle('Türkçe');
+      englishLanguage = screen.queryByTitle('English');
+    };
+
+    afterEach(() => {
+      i18n.global.locale = 'en';
+    });
+
+    it('initially displays all text in English', async () => {
+      setup();
+
+      expect(screen.queryByRole('heading', { name: en.signUp })).toBeInTheDocument();
+      expect(screen.queryByRole('button', { name: en.signUp })).toBeInTheDocument();
+      expect(screen.queryByLabelText(en.username)).toBeInTheDocument();
+      expect(screen.queryByLabelText(en.email)).toBeInTheDocument();
+      expect(screen.queryByLabelText(en.password)).toBeInTheDocument();
+      expect(screen.queryByLabelText(en.passwordRepeat)).toBeInTheDocument();
+    });
+
+    it('displays all text in Turkish after selecting that language', async () => {
+      setup();
+
+      await userEvent.click(turkishLanguage);
+
+      expect(screen.queryByRole('heading', { name: tr.signUp })).toBeInTheDocument();
+      expect(screen.queryByRole('button', { name: tr.signUp })).toBeInTheDocument();
+      expect(screen.queryByLabelText(tr.username)).toBeInTheDocument();
+      expect(screen.queryByLabelText(tr.email)).toBeInTheDocument();
+      expect(screen.queryByLabelText(tr.password)).toBeInTheDocument();
+      expect(screen.queryByLabelText(tr.passwordRepeat)).toBeInTheDocument();
+    });
+
+    it('displays all text in English after page is translated to Turkish', async () => {
+      setup();
+
+      await userEvent.click(turkishLanguage);
+      await userEvent.click(englishLanguage);
+
+      expect(screen.queryByRole('heading', { name: en.signUp })).toBeInTheDocument();
+      expect(screen.queryByRole('button', { name: en.signUp })).toBeInTheDocument();
+      expect(screen.queryByLabelText(en.username)).toBeInTheDocument();
+      expect(screen.queryByLabelText(en.email)).toBeInTheDocument();
+      expect(screen.queryByLabelText(en.password)).toBeInTheDocument();
+      expect(screen.queryByLabelText(en.passwordRepeat)).toBeInTheDocument();
     });
   });
 });

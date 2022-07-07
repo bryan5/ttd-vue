@@ -46,6 +46,7 @@
   </form>
 
   <div v-else class="alert alert-success mt-3">Please check your e-mail to activate your account</div>
+
 </div>
 </template>
 
