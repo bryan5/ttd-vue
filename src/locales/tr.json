@@ -1,0 +1,13 @@
+{
+  "signUp": "Kayıt Ol",
+  "username": "Kullanıcı Adı",
+  "email": "E-posta",
+  "password": "Şifre",
+  "passwordRepeat": "Şifre Tekrarı",
+  "passwordMismatchValidation": "Şifreniz eşleşmiyor",
+  "accountActivationNotification": "Hesabınızı aktifleştirmek için e-postanızı kontrol edin",
+  "users": "Kullanıclar",
+  "nextPage": "sonraki >",
+  "previousPage": "< önceki",
+  "login": "Oturum Aç"
+}
