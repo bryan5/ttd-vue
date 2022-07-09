@@ -1,6 +1,5 @@
 import SignUpPage from './SignUpPage.vue';
 import { render, screen, waitFor } from '@testing-library/vue';
-import "@testing-library/jest-dom";
 import userEvent from "@testing-library/user-event";
 import { setupServer } from 'msw/node';
 import { rest } from 'msw';
@@ -310,10 +309,6 @@ describe('Sign Up Page', () => {
       passwordRepeat = screen.queryByLabelText(en.passwordRepeat);
       button = screen.queryByRole('button', { name: en.signUp });
     };
-
-    afterEach(() => {
-      i18n.global.locale = 'en';
-    });
 
     it('initially displays all text in English', async () => {
       setup();
