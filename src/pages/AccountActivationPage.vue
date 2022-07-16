@@ -6,14 +6,19 @@
     <div v-if="fail" class="alert alert-danger mt-3">
       Activation failure
     </div>
-    <span v-if="apiProgress" class="spinner-border" role="status"></span>
+    <LoadingSpinner v-if="apiProgress" size="normal" />
   </div>
 </template>
 
 <script>
-import { activate } from '../api/apiCalls';
+import LoadingSpinner from '../components/LoadingSpinner'
+import { activate } from '../api/apiCalls'
 
 export default {
+  components: {
+    LoadingSpinner,
+  },
+
   data() {
     return {
       success: false,

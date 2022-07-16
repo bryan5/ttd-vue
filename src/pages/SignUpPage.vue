@@ -38,7 +38,7 @@
 
       <div class="text-center">
         <button class="btn btn-primary" :disabled="isDisabled || apiProgress" @click.prevent="submit">
-          <span v-if="apiProgress" class="spinner-border spinner-border-sm" role="status"></span>
+          <LoadingSpinner v-if="apiProgress" />
           {{ $t('signUp') }}
         </button>
       </div>
@@ -54,12 +54,14 @@
 import { signUp } from '../api/apiCalls'
 
 import GeneralInput from '../components/GeneralInput'
+import LoadingSpinner from '../components/LoadingSpinner'
 
 export default {
   name: 'SignUpPage',
 
   components: {
     GeneralInput,
+    LoadingSpinner,
   },
 
   data() {
