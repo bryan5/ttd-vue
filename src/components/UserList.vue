@@ -4,7 +4,13 @@
       <h3>Users</h3>
     </div>
     <ul class="list-group list-group-flush">
-      <li class="list-group-item list-group-item-action" v-for="user in page.content" :key="user.id">{{ user.username }}</li>
+      <li
+        class="list-group-item list-group-item-action"
+        v-for="user in page.content" :key="user.id"
+        @click="$router.push(`/user/${user.id}`)"
+      >
+          {{ user.username }}
+      </li>
     </ul>
     <div class="card-footer">
       <button v-if="page.page !== 0" class="btn btn-outline-secondary btn-sm" @click="loadData(page.page - 1)">
@@ -44,3 +50,9 @@ export default {
   },
 }
 </script>
+
+<style scoped>
+li {
+  cursor: pointer;
+}
+</style>
