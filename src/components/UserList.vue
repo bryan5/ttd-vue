@@ -9,7 +9,7 @@
         v-for="user in page.content" :key="user.id"
         @click="$router.push(`/user/${user.id}`)"
       >
-          {{ user.username }}
+        <UserListItem :user="user" />
       </li>
     </ul>
     <div class="card-footer">
@@ -25,8 +25,13 @@
 
 <script>
 import { loadUsers } from '../api/apiCalls'
+import UserListItem from './UserListItem'
 
 export default {
+  components: {
+    UserListItem,
+  },
+
   data() {
     return {
       page: {
