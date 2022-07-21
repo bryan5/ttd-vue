@@ -76,7 +76,7 @@ describe('User List', () => {
     await screen.findByText('user1');
 
     const nextPageLink = screen.queryByText('next >');
-    expect(nextPageLink).toBeInTheDocument();
+    expect(nextPageLink).toBeVisible();
   });
 
   it('displays next page after clicking next', async () => {
@@ -100,7 +100,7 @@ describe('User List', () => {
     await userEvent.click(screen.queryByText('next >'));
     await screen.findByText('user7');
 
-    expect(screen.queryByText('next >')).not.toBeInTheDocument();
+    expect(screen.queryByText('next >')).not.toBeVisible();
   });
 
   it('does not display the previous page link in first page', async () => {
@@ -108,7 +108,7 @@ describe('User List', () => {
 
     await screen.findByText('user1');
 
-    expect(screen.queryByText('< previous')).not.toBeInTheDocument();
+    expect(screen.queryByText('< previous')).not.toBeVisible();
   });
 
   it('displays previous page link in page 2', async () => {
@@ -118,7 +118,7 @@ describe('User List', () => {
     await userEvent.click(screen.queryByText('next >'));
     await screen.findByText('user4');
 
-    expect(screen.queryByText('< previous')).toBeInTheDocument();
+    expect(screen.queryByText('< previous')).toBeVisible();
   });
 
   it('displays previous page after clicking previous page link', async () => {
@@ -131,5 +131,32 @@ describe('User List', () => {
 
     const firstUserOnPage1 = await screen.findByText('user1');
     expect(firstUserOnPage1).toBeInTheDocument();
+  });
+
+  it('displays spinner while the api call is in progress', async () => {
+    setup();
+
+    const spinner = screen.queryByRole('status');
+    expect(spinner).toBeVisible();
+  });
+
+  it('hides spinner after api call is completed', async () => {
+    setup();
+
+    const spinner = screen.queryByRole('status');
+
+    await screen.findByText('user1');
+
+    expect(spinner).not.toBeVisible();
+  });
+
+  it('displays spinner after clicking next', async () => {
+    await setup();
+    await screen.findByText('user1');
+
+    userEvent.click(screen.queryByText('next >'));
+
+    const spinner = await screen.findByRole('status');
+    expect(spinner).toBeVisible();
   });
 });
