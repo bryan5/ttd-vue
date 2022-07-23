@@ -4,6 +4,10 @@ import { setupServer } from 'msw/node';
 import { rest } from 'msw';
 import userEvent from '@testing-library/user-event';
 import router from '../routes/router';
+import en from '../locales/en.json';
+import tr from '../locales/tr.json';
+import i18n from '../locales/i18n';
+import LanguageSelector from './LanguageSelector.vue';
 
 const server = setupServer(
   rest.get('/api/1.0/users', (req, res, ctx) => {
@@ -52,9 +56,20 @@ const users = [
 ];
 
 const setup = async () => {
-  render(UserList, {
+  const app = {
+    components: {
+      UserList,
+      LanguageSelector,
+    },
+    template: `
+    <UserList />
+    <LanguageSelector />
+    `,
+  };
+
+  render(app, {
     global: {
-      plugins: [ router ],
+      plugins: [ router, i18n ],
     },
   });
 
@@ -158,5 +173,32 @@ describe('User List', () => {
 
     const spinner = await screen.findByRole('status');
     expect(spinner).toBeVisible();
+  });
+});
+
+describe('Internationalization', () => {
+  it('initially displays header and navigation links in English', async () => {
+    await setup();
+    await screen.findByText('user1');
+    await userEvent.click(screen.queryByText('next >'));
+    await screen.findByText('user4');
+
+    expect(screen.queryByText(en.users)).toBeInTheDocument();
+    expect(screen.queryByText(en.nextPage)).toBeInTheDocument();
+    expect(screen.queryByText(en.previousPage)).toBeInTheDocument();
+  });
+
+  it('displays header and navigation links in Turkish after selecting that language', async () => {
+    await setup();
+    await screen.findByText('user1');
+    await userEvent.click(screen.queryByText('next >'));
+    await screen.findByText('user4');
+
+    const turkishLanguageSelector = screen.queryByTitle('Türkçe');
+    await userEvent.click(turkishLanguageSelector);
+
+    expect(screen.queryByText(tr.users)).toBeInTheDocument();
+    expect(screen.queryByText(tr.nextPage)).toBeInTheDocument();
+    expect(screen.queryByText(tr.previousPage)).toBeInTheDocument();
   });
 });
