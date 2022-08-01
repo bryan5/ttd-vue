@@ -20,7 +20,10 @@
         />
 
         <div class="text-center">
-          <button class="btn btn-primary" :disabled="isDisabled">Login</button>
+          <button class="btn btn-primary" :disabled="isDisabled || apiProgress" @click.prevent="submit">
+            <LoadingSpinner v-if="apiProgress" />
+            Login
+          </button>
         </div>
       </div>
     </form>
@@ -29,22 +32,45 @@
 
 <script>
 import GeneralInput from '../components/GeneralInput'
+import LoadingSpinner from '../components/LoadingSpinner'
+import { login } from '../api/apiCalls'
 
 export default {
   components: {
-    GeneralInput
+    GeneralInput,
+    LoadingSpinner
   },
 
   data() {
     return {
       email: '',
-      password: ''
+      password: '',
+      apiProgress: false,
+
+      error: null
     }
   },
 
   computed: {
     isDisabled() {
       return !(this.email && this.password)
+    }
+  },
+
+  methods: {
+    async submit() {
+      this.apiProgress = true
+
+      try {
+        await login({
+          email: this.email,
+          password: this.password
+        });
+      } catch (error) {
+        this.error = error
+      }
+
+      this.apiProgress = false
     }
   },
 }
