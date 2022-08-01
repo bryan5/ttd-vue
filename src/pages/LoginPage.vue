@@ -19,6 +19,10 @@
           type="password"
         />
 
+        <div v-if="failMessage" class="alert alert-danger text-center">
+          {{ failMessage }}
+        </div>
+
         <div class="text-center">
           <button class="btn btn-primary" :disabled="isDisabled || apiProgress" @click.prevent="submit">
             <LoadingSpinner v-if="apiProgress" />
@@ -46,8 +50,7 @@ export default {
       email: '',
       password: '',
       apiProgress: false,
-
-      error: null
+      failMessage: undefined
     }
   },
 
@@ -67,10 +70,20 @@ export default {
           password: this.password
         });
       } catch (error) {
-        this.error = error
+        this.failMessage = error.response.data.message
       }
 
       this.apiProgress = false
+    }
+  },
+
+  watch: {
+    email() {
+      this.failMessage = undefined
+    },
+
+    password() {
+      this.failMessage = undefined
     }
   },
 }
