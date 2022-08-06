@@ -1,51 +1,52 @@
 <template>
 <div class="col-lg-6 offset-lg-3 col-md-8 offset-md-2" data-testid="signup-page">
-  <form v-if="!signUpSuccess" class="card mt-5" data-testid="form-sign-up">
-    <div class="card-header">
-      <h1 class="text-center">{{ $t('signUp') }}</h1>
-    </div>
+  <form v-if="!signUpSuccess" class="mt-5" data-testid="form-sign-up">
+    <GeneralCard>
+      <template v-slot:header>
+        <h1>{{ $t('signUp') }}</h1>
+      </template>
+      <template v-slot:body>
+        <GeneralInput
+          id="username"
+          :label="$t('username')"
+          :help="errors.username"
+          v-model="username"
+        />
 
-    <div class="card-body">
-      <GeneralInput
-        id="username"
-        :label="$t('username')"
-        :help="errors.username"
-        v-model="username"
-      />
+        <GeneralInput
+          id="e-mail"
+          :label="$t('email')"
+          :help="errors.email"
+          v-model="email"
+        />
 
-      <GeneralInput
-        id="e-mail"
-        :label="$t('email')"
-        :help="errors.email"
-        v-model="email"
-      />
+        <GeneralInput
+          id="password"
+          :label="$t('password')"
+          :help="errors.password"
+          v-model="password"
+          type="password"
+        />
 
-      <GeneralInput
-        id="password"
-        :label="$t('password')"
-        :help="errors.password"
-        v-model="password"
-        type="password"
-      />
+        <GeneralInput
+          id="password-repeat"
+          :label="$t('passwordRepeat')"
+          :help="hasPasswordMismatch ? $t('passwordMismatchValidation') : ''"
+          v-model="passwordRepeat"
+          type="password"
+        />
 
-      <GeneralInput
-        id="password-repeat"
-        :label="$t('passwordRepeat')"
-        :help="hasPasswordMismatch ? $t('passwordMismatchValidation') : ''"
-        v-model="passwordRepeat"
-        type="password"
-      />
-
-      <div class="text-center">
-        <ButtonWithProgress
-          :apiProgress="apiProgress"
-          :disabled="isDisabled"
-          @click-custom-button="submit"
-        >
-          {{ $t('signUp') }}
-        </ButtonWithProgress>
-      </div>
-    </div>
+        <div class="text-center">
+          <ButtonWithProgress
+            :apiProgress="apiProgress"
+            :disabled="isDisabled"
+            @click-custom-button="submit"
+          >
+            {{ $t('signUp') }}
+          </ButtonWithProgress>
+        </div>
+      </template>
+    </GeneralCard>
   </form>
 
   <div v-else class="alert alert-success mt-3">{{ $t('accountActivationNotification') }}</div>
@@ -58,6 +59,7 @@ import { signUp } from '../api/apiCalls'
 
 import GeneralInput from '../components/GeneralInput'
 import ButtonWithProgress from '../components/ButtonWithProgress'
+import GeneralCard from '../components/GeneralCard'
 
 export default {
   name: 'SignUpPage',
@@ -65,6 +67,7 @@ export default {
   components: {
     GeneralInput,
     ButtonWithProgress,
+    GeneralCard
   },
 
   data() {

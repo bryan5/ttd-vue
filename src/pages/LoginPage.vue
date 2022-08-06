@@ -1,51 +1,54 @@
 <template>
   <div class="col-lg-6 offset-lg-3 col-md-8 offset-md-2" data-testid="login-page">
-    <form class="card mt-5">
-      <div class="card-header">
-        <h1 class="text-center">{{ $t('login') }}</h1>
-      </div>
+    <form class="mt-5">
+      <GeneralCard>
+        <template v-slot:header>
+          <h1>{{ $t('login') }}</h1>
+        </template>
+        <template v-slot:body>
+          <GeneralInput
+            id="e-mail"
+            :label="$t('email')"
+            v-model="email"
+          />
 
-      <div class="card-body">
-        <GeneralInput
-          id="e-mail"
-          :label="$t('email')"
-          v-model="email"
-        />
+          <GeneralInput
+            id="password"
+            :label="$t('password')"
+            v-model="password"
+            type="password"
+          />
 
-        <GeneralInput
-          id="password"
-          :label="$t('password')"
-          v-model="password"
-          type="password"
-        />
+          <div v-if="failMessage" class="alert alert-danger text-center">
+            {{ failMessage }}
+          </div>
 
-        <div v-if="failMessage" class="alert alert-danger text-center">
-          {{ failMessage }}
-        </div>
-
-        <div class="text-center">
-          <ButtonWithProgress
-            :apiProgress="apiProgress"
-            :disabled="isDisabled"
-            @click-custom-button="submit"
-          >
-            {{ $t('login') }}
-          </ButtonWithProgress>
-        </div>
-      </div>
+          <div class="text-center">
+            <ButtonWithProgress
+              :apiProgress="apiProgress"
+              :disabled="isDisabled"
+              @click-custom-button="submit"
+            >
+              {{ $t('login') }}
+            </ButtonWithProgress>
+          </div>
+        </template>
+      </GeneralCard>
     </form>
   </div>
 </template>
 
 <script>
 import ButtonWithProgress from '../components/ButtonWithProgress'
+import GeneralCard from '../components/GeneralCard'
 import GeneralInput from '../components/GeneralInput'
 import { login } from '../api/apiCalls'
 
 export default {
   components: {
     GeneralInput,
-    ButtonWithProgress
+    ButtonWithProgress,
+    GeneralCard
   },
 
   data() {

@@ -1,19 +1,21 @@
 <template>
-  <div class="card">
-    <div class="card-header text-center">
+  <GeneralCard>
+    <template v-slot:header>
       <h3>{{ $t('users') }}</h3>
-    </div>
-    <ul class="list-group list-group-flush">
-      <li
-        class="list-group-item list-group-item-action"
-        v-for="user in page.content"
-        :key="user.id"
-        @click="$router.push(`/user/${user.id}`)"
-      >
-        <UserListItem :user="user" />
-      </li>
-    </ul>
-    <div class="card-footer text-center">
+    </template>
+    <template v-slot:default>
+      <ul class="list-group list-group-flush">
+        <li
+          class="list-group-item list-group-item-action"
+          v-for="user in page.content"
+          :key="user.id"
+          @click="$router.push(`/user/${user.id}`)"
+        >
+          <UserListItem :user="user" />
+        </li>
+      </ul>
+    </template>
+    <template v-slot:footer>
       <button v-show="page.page !== 0 && !pendingApiCall" class="btn btn-outline-secondary btn-sm float-start" @click="loadData(page.page - 1)">
         {{ $t('previousPage') }}
       </button>
@@ -21,19 +23,21 @@
         {{ $t('nextPage') }}
       </button>
       <LoadingSpinner v-show="pendingApiCall" size="normal" />
-    </div>
-  </div>
+    </template>
+  </GeneralCard>
 </template>
 
 <script>
 import { loadUsers } from '../api/apiCalls'
 import UserListItem from './UserListItem'
 import LoadingSpinner from './LoadingSpinner'
+import GeneralCard from './GeneralCard'
 
 export default {
   components: {
     UserListItem,
     LoadingSpinner,
+    GeneralCard
   },
 
   data() {
