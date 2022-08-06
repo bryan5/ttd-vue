@@ -24,10 +24,13 @@
         </div>
 
         <div class="text-center">
-          <button class="btn btn-primary" :disabled="isDisabled || apiProgress" @click.prevent="submit">
-            <LoadingSpinner v-if="apiProgress" />
+          <ButtonWithProgress
+            :apiProgress="apiProgress"
+            :disabled="isDisabled"
+            @click-custom-button="submit"
+          >
             {{ $t('login') }}
-          </button>
+          </ButtonWithProgress>
         </div>
       </div>
     </form>
@@ -35,14 +38,14 @@
 </template>
 
 <script>
+import ButtonWithProgress from '../components/ButtonWithProgress'
 import GeneralInput from '../components/GeneralInput'
-import LoadingSpinner from '../components/LoadingSpinner'
 import { login } from '../api/apiCalls'
 
 export default {
   components: {
     GeneralInput,
-    LoadingSpinner
+    ButtonWithProgress
   },
 
   data() {
