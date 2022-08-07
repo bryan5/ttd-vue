@@ -7,6 +7,8 @@ import i18n from '../locales/i18n';
 import en from '../locales/en.json';
 import tr from '../locales/tr.json';
 import LanguageSelector from '../components/LanguageSelector.vue';
+import store from '../state/store';
+import storage from '../state/storage';
 
 let requestBody, acceptLanguageHeader, counter = 0;
 const server = setupServer(
@@ -20,7 +22,7 @@ const server = setupServer(
         message: 'Incorrect credentials'
       })
     );
-  }),
+  })
 );
 
 beforeAll(() => server.listen());
@@ -36,14 +38,31 @@ let emailInput, passwordInput, button;
 const setup = async () => {
   render(LoginPage, {
     global: {
-      plugins: [i18n],
-    },
+      plugins: [i18n, store],
+      mocks: {
+        $router: {
+          push: () => {}
+        }
+      }
+    }
   });
 
   emailInput = screen.queryByLabelText('E-mail');
   passwordInput = screen.queryByLabelText('Password');
   button = screen.queryByRole('button', { name: 'Login' });
-}
+};
+
+const loginSuccess = rest.post('/api/1.0/auth', (req, res, ctx) => {
+  return res(
+    ctx.status(200),
+    ctx.json({
+      id: 5,
+      username: 'user5',
+      image: null,
+      token: 'abcdefgh'
+    })
+  );
+});
 
 describe('Login Page', () => {
   describe('Layout', () => {
@@ -143,7 +162,7 @@ describe('Login Page', () => {
       userEvent.click(button);
       userEvent.click(button);
 
-      const spinner = (await screen.findByRole('status'));
+      const spinner = await screen.findByRole('status');
       await waitForElementToBeRemoved(spinner);
 
       expect(counter).toBe(1);
@@ -177,6 +196,39 @@ describe('Login Page', () => {
       await userEvent.type(passwordInput, 'n3wP4ssword')
 
       expect(errorMessage).not.toBeInTheDocument();
+    });
+
+    it('stores id, username, and image in storage', async () => {
+      server.use(loginSuccess);
+
+      await setupFilled();
+
+      userEvent.click(button);
+
+      const spinner = await screen.findByRole('status');
+      await waitForElementToBeRemoved(spinner);
+
+      const storedState = storage.getItem('auth');
+      const keys = Object.keys(storedState);
+
+      expect(keys.includes('id')).toBeTruthy();
+      expect(keys.includes('username')).toBeTruthy();
+      expect(keys.includes('image')).toBeTruthy();
+    });
+
+    it('stores authorization value header in storage', async () => {
+      server.use(loginSuccess);
+
+      await setupFilled();
+
+      userEvent.click(button);
+
+      const spinner = await screen.findByRole('status');
+      await waitForElementToBeRemoved(spinner);
+
+      const storedState = storage.getItem('auth');
+      
+      expect(storedState.header).toBe('Bearer abcdefgh');
     });
   });
 

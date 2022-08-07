@@ -7,9 +7,11 @@ const store = createStore({
   },
 
   mutations: {
-    loginSuccess(state, id) {
+    loginSuccess(state, data) {
       state.isLoggedIn = true;
-      state.id = id;
+      for (let key in data) {
+        state[key] = data[key];
+      }
     },
 
     reset(state, initialState) {
